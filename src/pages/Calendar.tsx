@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { CreateEventDialog } from "@/components/events/CreateEventDialog";
 import { EditEventDialog } from "@/components/events/EditEventDialog";
 import { EventCard } from "@/components/events/EventCard";
-import { getUserCalendars, createSimpleCalendar } from "@/utils/calendarUtils";
+import { getUltraSimpleCalendars, createUltraSimpleCalendar } from "@/utils/simpleCalendarUtils";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 
 type Calendar = {
@@ -89,8 +89,8 @@ const Calendar = () => {
 
       console.log("Fetching calendar for user:", user.id);
 
-      // Use the utility function to get user calendars
-      const calendars = await getUserCalendars(user.id);
+      // Use the ultra-simple utility function to get user calendars
+      const calendars = await getUltraSimpleCalendars(user.id);
       
       if (calendars && calendars.length > 0) {
         console.log("Found existing calendar:", calendars[0]);
@@ -98,19 +98,32 @@ const Calendar = () => {
         return;
       }
 
-      // No calendar found, create a simple one
-      console.log("No calendar found, creating new one...");
-      const newCalendar = await createSimpleCalendar(user.id);
+      // No calendar found, create an ultra-simple one
+      console.log("No calendar found, creating ultra-simple calendar...");
+      const newCalendar = await createUltraSimpleCalendar(user.id);
       
       if (newCalendar) {
-        console.log("Created new calendar:", newCalendar);
+        console.log("Successfully created ultra-simple calendar:", newCalendar);
         setCalendar(newCalendar);
       } else {
-        console.error("Failed to create calendar");
+        console.error("Failed to create ultra-simple calendar - creating temporary calendar for testing");
+        
+        // Last resort: Create a temporary calendar object for the UI
+        const tempCalendar = {
+          id: "temp-calendar-" + Date.now(),
+          name: "My Calendar",
+          description: "Your personal calendar for events and appointments",
+          color: "#7CC3FF",
+          visibility: "private",
+          created_at: new Date().toISOString(),
+        };
+        
+        console.log("Created temporary calendar for testing:", tempCalendar);
+        setCalendar(tempCalendar as any);
+        
         toast({
-          title: "Error creating calendar",
-          description: "Could not create your calendar. Please try again.",
-          variant: "destructive",
+          title: "Calendar loaded (temporary mode)",
+          description: "Using temporary calendar. Events may not be saved permanently.",
         });
       }
 
@@ -130,6 +143,7 @@ const Calendar = () => {
 
       // Skip event fetching for temporary calendars
       if (calendar.id.startsWith('temp-')) {
+        console.log("Skipping event fetch for temporary calendar");
         setEvents([]);
         setLoading(false);
         return;
