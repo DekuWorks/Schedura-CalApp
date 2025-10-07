@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarIcon, Clock, MapPin, Users } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, MapPin, Users, Tag, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { EVENT_CATEGORIES } from "@/config/categories";
+import { TIMEZONES, getUserTimezone } from "@/config/timezones";
 
 interface CreateEventDialogProps {
   open: boolean;
@@ -37,6 +39,8 @@ export const CreateEventDialog = ({
     endTime: "10:00",
     allDay: false,
     attendees: "",
+    category: "personal",
+    timezone: getUserTimezone(),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,6 +87,8 @@ export const CreateEventDialog = ({
           start_at: startAt.toISOString(),
           end_at: endAt.toISOString(),
           all_day: formData.allDay,
+          category: formData.category,
+          timezone: formData.timezone,
           created_by: user.id,
         }])
         .select()
@@ -123,6 +129,8 @@ export const CreateEventDialog = ({
         endTime: "10:00",
         allDay: false,
         attendees: "",
+        category: "personal",
+        timezone: getUserTimezone(),
       });
       
       onOpenChange(false);
@@ -194,6 +202,55 @@ export const CreateEventDialog = ({
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 className="bg-surface pl-10"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <div className="relative">
+                <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                  <SelectTrigger className="bg-surface pl-10">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{EVENT_CATEGORIES.find(c => c.value === formData.category)?.icon}</span>
+                      <SelectValue />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EVENT_CATEGORIES.map((category) => (
+                      <SelectItem key={category.value} value={category.value}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{category.icon}</span>
+                          <span>{category.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="timezone">Timezone</Label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Select value={formData.timezone} onValueChange={(value) => setFormData({ ...formData, timezone: value })}>
+                  <SelectTrigger className="bg-surface pl-10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px]">
+                    {TIMEZONES.map((timezone) => (
+                      <SelectItem key={timezone.value} value={timezone.value}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{timezone.label}</span>
+                          <span className="text-xs text-muted-foreground ml-2">{timezone.offset}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 

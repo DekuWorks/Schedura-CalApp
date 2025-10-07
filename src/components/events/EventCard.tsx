@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, Users, Edit, Trash2 } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Edit, Trash2, Tag, Globe } from "lucide-react";
 import { format, isToday, isTomorrow, isYesterday } from "date-fns";
 import {
   AlertDialog,
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getCategoryByValue } from "@/config/categories";
+import { getTimezoneByValue } from "@/config/timezones";
 
 type Event = {
   id: string;
@@ -25,6 +27,8 @@ type Event = {
   start_at: string;
   end_at: string;
   all_day: boolean;
+  category?: string;
+  timezone?: string;
   created_at: string;
   attendees?: Array<{
     id: string;
@@ -124,6 +128,19 @@ export const EventCard = ({ event, onDeleted, onEdit }: EventCardProps) => {
                 All Day
               </Badge>
             )}
+            {event.category && (
+              <Badge 
+                variant="outline" 
+                className="text-xs"
+                style={{ 
+                  borderColor: getCategoryByValue(event.category)?.color + '40',
+                  color: getCategoryByValue(event.category)?.color 
+                }}
+              >
+                <span className="mr-1">{getCategoryByValue(event.category)?.icon}</span>
+                {getCategoryByValue(event.category)?.label}
+              </Badge>
+            )}
             {getAttendeeStatus() && (
               <Badge variant="outline" className="text-xs">
                 {getAttendeeStatus()}
@@ -144,6 +161,13 @@ export const EventCard = ({ event, onDeleted, onEdit }: EventCardProps) => {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="w-4 h-4" />
             <span className="line-clamp-1">{event.location}</span>
+          </div>
+        )}
+
+        {event.timezone && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Globe className="w-4 h-4" />
+            <span>{getTimezoneByValue(event.timezone)?.label}</span>
           </div>
         )}
 
