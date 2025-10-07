@@ -112,7 +112,7 @@ const App = () => {
               icon={<Plus className="w-8 h-8 text-primary" />}
               title="Create Event"
               description="Add a new event to your schedule"
-              onClick={() => toast({ title: "Coming soon!", description: "Event creation is being built." })}
+              onClick={() => navigate("/calendars")}
               highlighted
             />
             
@@ -135,7 +135,7 @@ const App = () => {
             </p>
             <Button 
               className="gradient-hero shadow-soft hover:shadow-medium transition-smooth"
-              onClick={() => toast({ title: "Coming soon!", description: "Full calendar features are being built." })}
+              onClick={() => navigate("/calendars")}
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Your First Calendar
