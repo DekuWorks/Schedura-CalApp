@@ -9,8 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar as CalendarIcon, Clock, MapPin, Users, Tag, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { EVENT_CATEGORIES } from "@/config/categories";
+import { EVENT_CATEGORIES, getCategoryColorWithCustom, setCustomCategoryColor } from "@/config/categories";
 import { TIMEZONES, getUserTimezone } from "@/config/timezones";
+import { ColorPicker } from "@/components/ui/color-picker";
 
 interface CreateEventDialogProps {
   open: boolean;
@@ -41,6 +42,7 @@ export const CreateEventDialog = ({
     attendees: "",
     category: "personal",
     timezone: getUserTimezone(),
+    categoryColor: getCategoryColorWithCustom("personal"),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -131,6 +133,7 @@ export const CreateEventDialog = ({
         attendees: "",
         category: "personal",
         timezone: getUserTimezone(),
+        categoryColor: getCategoryColorWithCustom("personal"),
       });
       
       onOpenChange(false);
@@ -152,6 +155,16 @@ export const CreateEventDialog = ({
       // If all day, set end date to same as start date
       setFormData(prev => ({ ...prev, endDate: prev.startDate }));
     }
+  };
+
+  const handleCategoryChange = (category: string) => {
+    const color = getCategoryColorWithCustom(category);
+    setFormData({ ...formData, category, categoryColor: color });
+  };
+
+  const handleCategoryColorChange = (color: string) => {
+    setCustomCategoryColor(formData.category, color);
+    setFormData({ ...formData, categoryColor: color });
   };
 
   return (
@@ -210,12 +223,9 @@ export const CreateEventDialog = ({
               <Label htmlFor="category">Category</Label>
               <div className="relative">
                 <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                <Select value={formData.category} onValueChange={handleCategoryChange}>
                   <SelectTrigger className="bg-surface pl-10">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{EVENT_CATEGORIES.find(c => c.value === formData.category)?.icon}</span>
-                      <SelectValue />
-                    </div>
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {EVENT_CATEGORIES.map((category) => (
@@ -252,6 +262,14 @@ export const CreateEventDialog = ({
                 </Select>
               </div>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="categoryColor">Category Color</Label>
+            <ColorPicker
+              value={formData.categoryColor}
+              onChange={handleCategoryColorChange}
+            />
           </div>
 
           <div className="flex items-center space-x-2">

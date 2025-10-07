@@ -3,6 +3,7 @@ export interface EventCategory {
   label: string;
   color: string;
   icon: string;
+  customColor?: boolean;
 }
 
 export const EVENT_CATEGORIES: EventCategory[] = [
@@ -80,4 +81,33 @@ export const getCategoryColor = (value: string): string => {
 export const getCategoryIcon = (value: string): string => {
   const category = getCategoryByValue(value);
   return category ? category.icon : '📝';
+};
+
+// Custom color management
+const CUSTOM_COLORS_KEY = 'schedura-category-colors';
+
+export const getCustomCategoryColors = (): Record<string, string> => {
+  if (typeof window === 'undefined') return {};
+  try {
+    const stored = localStorage.getItem(CUSTOM_COLORS_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+};
+
+export const setCustomCategoryColor = (categoryValue: string, color: string): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = getCustomCategoryColors();
+    current[categoryValue] = color;
+    localStorage.setItem(CUSTOM_COLORS_KEY, JSON.stringify(current));
+  } catch {
+    // Ignore storage errors
+  }
+};
+
+export const getCategoryColorWithCustom = (value: string): string => {
+  const customColors = getCustomCategoryColors();
+  return customColors[value] || getCategoryColor(value);
 };

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getCategoryByValue } from "@/config/categories";
+import { getCategoryByValue, getCategoryColorWithCustom } from "@/config/categories";
 import { getTimezoneByValue } from "@/config/timezones";
 
 type Event = {
@@ -133,8 +133,8 @@ export const EventCard = ({ event, onDeleted, onEdit }: EventCardProps) => {
                 variant="outline" 
                 className="text-xs"
                 style={{ 
-                  borderColor: getCategoryByValue(event.category)?.color + '40',
-                  color: getCategoryByValue(event.category)?.color 
+                  borderColor: getCategoryColorWithCustom(event.category) + '40',
+                  color: getCategoryColorWithCustom(event.category)
                 }}
               >
                 <span className="mr-1">{getCategoryByValue(event.category)?.icon}</span>
