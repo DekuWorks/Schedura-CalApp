@@ -73,17 +73,24 @@ const Calendar = () => {
   useEffect(() => {
     if (user) {
       fetchUserCalendar();
-      fetchEvents();
     }
   }, [user]);
 
+  useEffect(() => {
+    if (calendar) {
+      fetchEvents();
+    }
+  }, [calendar]);
+
   const fetchUserCalendar = async () => {
     try {
-      // Get user's default calendar
+      if (!user) return;
+
+      // First try to get user's default calendar
       const { data: profile } = await supabase
         .from("profiles")
         .select("default_calendar_id")
-        .eq("user_id", user?.id)
+        .eq("user_id", user.id)
         .single();
 
       if (profile?.default_calendar_id) {
@@ -95,7 +102,49 @@ const Calendar = () => {
 
         if (error) throw error;
         setCalendar(calendarData);
+        return;
       }
+
+      // Fallback: Get user's first calendar (for existing users)
+      const { data: calendars, error: calendarsError } = await supabase
+        .from("calendars")
+        .select("*")
+        .eq("created_by", user.id)
+        .limit(1);
+
+      if (calendarsError) throw calendarsError;
+
+      if (calendars && calendars.length > 0) {
+        setCalendar(calendars[0]);
+        return;
+      }
+
+      // If no calendar exists, create one
+      const { data: orgs, error: orgError } = await supabase
+        .from("organisations")
+        .select("id")
+        .eq("owner_id", user.id)
+        .eq("is_personal", true)
+        .single();
+
+      if (orgError) throw orgError;
+
+      const { data: newCalendar, error: createError } = await supabase
+        .from("calendars")
+        .insert([{
+          org_id: orgs.id,
+          name: "My Calendar",
+          description: "Your personal calendar for events and appointments",
+          color: "#7CC3FF",
+          visibility: "private",
+          created_by: user.id,
+        }])
+        .select()
+        .single();
+
+      if (createError) throw createError;
+      setCalendar(newCalendar);
+
     } catch (error: any) {
       console.error("Error fetching user calendar:", error);
       toast({
@@ -108,33 +157,24 @@ const Calendar = () => {
 
   const fetchEvents = async () => {
     try {
-      if (!user) return;
+      if (!user || !calendar) return;
 
-      // Get user's default calendar ID
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("default_calendar_id")
-        .eq("user_id", user.id)
-        .single();
+      const { data, error } = await supabase
+        .from("events")
+        .select(`
+          *,
+          attendees (
+            id,
+            email,
+            name,
+            response
+          )
+        `)
+        .eq("calendar_id", calendar.id)
+        .order("start_at", { ascending: true });
 
-      if (profile?.default_calendar_id) {
-        const { data, error } = await supabase
-          .from("events")
-          .select(`
-            *,
-            attendees (
-              id,
-              email,
-              name,
-              response
-            )
-          `)
-          .eq("calendar_id", profile.default_calendar_id)
-          .order("start_at", { ascending: true });
-
-        if (error) throw error;
-        setEvents(data || []);
-      }
+      if (error) throw error;
+      setEvents(data || []);
     } catch (error: any) {
       toast({
         title: "Error loading events",
