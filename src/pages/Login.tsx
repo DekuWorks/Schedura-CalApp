@@ -32,7 +32,7 @@ const Login = () => {
         description: "You've successfully logged in.",
       });
       
-      navigate("/app");
+      navigate("/calendar");
     } catch (error: any) {
       toast({
         title: "Login failed",

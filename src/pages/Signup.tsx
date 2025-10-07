@@ -55,7 +55,7 @@ const Signup = () => {
         description: "Welcome to Schedura. Let's get started!",
       });
       
-      navigate("/app");
+      navigate("/calendar");
     } catch (error: any) {
       toast({
         title: "Signup failed",
