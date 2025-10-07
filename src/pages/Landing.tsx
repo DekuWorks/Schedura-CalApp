@@ -45,7 +45,7 @@ const Landing = () => {
           <h2 className="text-5xl md:text-7xl font-bold text-foreground leading-tight">
             Your calendar,
             <br />
-            <span className="gradient-hero bg-clip-text text-transparent">
+            <span className="text-primary">
               beautifully organized
             </span>
           </h2>
