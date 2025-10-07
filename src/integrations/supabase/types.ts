@@ -14,7 +14,303 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendees: {
+        Row: {
+          created_at: string
+          email: string
+          event_id: string
+          id: string
+          name: string | null
+          response: Database["public"]["Enums"]["attendee_response"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_id: string
+          id?: string
+          name?: string | null
+          response?: Database["public"]["Enums"]["attendee_response"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_id?: string
+          id?: string
+          name?: string | null
+          response?: Database["public"]["Enums"]["attendee_response"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calendars: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          org_id: string
+          public_id: string | null
+          updated_at: string
+          visibility: Database["public"]["Enums"]["calendar_visibility"]
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          org_id: string
+          public_id?: string | null
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["calendar_visibility"]
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          org_id?: string
+          public_id?: string | null
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["calendar_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendars_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          all_day: boolean
+          calendar_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          end_at: string
+          id: string
+          location: string | null
+          org_id: string
+          rrule: string | null
+          start_at: string
+          timezone: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          all_day?: boolean
+          calendar_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_at: string
+          id?: string
+          location?: string | null
+          org_id: string
+          rrule?: string | null
+          start_at: string
+          timezone?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          all_day?: boolean
+          calendar_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_at?: string
+          id?: string
+          location?: string | null
+          org_id?: string
+          rrule?: string | null
+          start_at?: string
+          timezone?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "calendars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invites: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          org_id: string
+          role: Database["public"]["Enums"]["organisation_role"]
+          status: Database["public"]["Enums"]["invite_status"]
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          invited_by: string
+          org_id: string
+          role?: Database["public"]["Enums"]["organisation_role"]
+          status?: Database["public"]["Enums"]["invite_status"]
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          org_id?: string
+          role?: Database["public"]["Enums"]["organisation_role"]
+          status?: Database["public"]["Enums"]["invite_status"]
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memberships: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          profile_id: string
+          role: Database["public"]["Enums"]["organisation_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          profile_id: string
+          role?: Database["public"]["Enums"]["organisation_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          profile_id?: string
+          role?: Database["public"]["Enums"]["organisation_role"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memberships_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memberships_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organisations: {
+        Row: {
+          created_at: string
+          id: string
+          is_personal: boolean
+          name: string
+          owner_id: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_personal?: boolean
+          name: string
+          owner_id: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_personal?: boolean
+          name?: string
+          owner_id?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +319,10 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      attendee_response: "pending" | "accepted" | "declined" | "tentative"
+      calendar_visibility: "private" | "team" | "public"
+      invite_status: "pending" | "accepted" | "declined" | "expired"
+      organisation_role: "owner" | "admin" | "member" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +449,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      attendee_response: ["pending", "accepted", "declined", "tentative"],
+      calendar_visibility: ["private", "team", "public"],
+      invite_status: ["pending", "accepted", "declined", "expired"],
+      organisation_role: ["owner", "admin", "member", "viewer"],
+    },
   },
 } as const

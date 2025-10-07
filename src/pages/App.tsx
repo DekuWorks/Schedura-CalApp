@@ -105,7 +105,7 @@ const App = () => {
               icon={<Calendar className="w-8 h-8 text-primary" />}
               title="My Calendars"
               description="View and manage all your calendars"
-              onClick={() => toast({ title: "Coming soon!", description: "Calendar management is being built." })}
+              onClick={() => navigate("/calendars")}
             />
             
             <QuickActionCard
